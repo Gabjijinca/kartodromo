@@ -13,5 +13,8 @@ public interface PiltotoReposit extends JpaRepository<Piloto,Long> {
 List<Piloto> findByNomeAndEquipe(String nome, Equipe equipe);
 
 
+    List<PilotoView> findAllBy();
+
+
 
 }

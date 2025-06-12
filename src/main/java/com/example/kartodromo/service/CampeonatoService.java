@@ -7,6 +7,7 @@ import com.example.kartodromo.Exception.DuplicateException;
 import com.example.kartodromo.Exception.NotFoundException;
 import com.example.kartodromo.Repositorio.CampeonatoReposit;
 import com.example.kartodromo.Repositorio.PiltotoReposit;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -26,16 +27,18 @@ public class CampeonatoService {
     }
 
     public Campeonato salvar(CadastroCampeonatoDTO dto) {
-        List<Long> ids = List.of(dto.first(), dto.second(), dto.third())    ;
+        List<Long> ids = List.of(dto.first(), dto.second(), dto.third());
         Set<Long> unicos = Set.copyOf(ids);
         if(ids.size() != unicos.size()){
-            throw new DuplicateException("Um piloto não pode ocupar mais de uma posição no Póido");
+            throw new DuplicateException("Um piloto não pode ocupar mais de uma posição no Pódio");
         }
 
-
-        Piloto piloto1 = pilotoRepo.findById(dto.first()).orElseThrow();
-        Piloto piloto2 = pilotoRepo.findById(dto.second()).orElseThrow();
-        Piloto piloto3 = pilotoRepo.findById(dto.third()).orElseThrow();
+        Piloto piloto1 = pilotoRepo.findById(dto.first())
+                .orElseThrow(() -> new NotFoundException("Piloto com id " + dto.first() + " não encontrado."));
+        Piloto piloto2 = pilotoRepo.findById(dto.second())
+                .orElseThrow(() -> new NotFoundException("Piloto com id " + dto.second() + " não encontrado."));
+        Piloto piloto3 = pilotoRepo.findById(dto.third())
+                .orElseThrow(() -> new NotFoundException("Piloto com id " + dto.third() + " não encontrado."));
 
         Campeonato campeonato = dto.mapeamento(piloto1, piloto2, piloto3);
 
@@ -45,6 +48,9 @@ public class CampeonatoService {
 
         return reposit.save(campeonato);
     }
+
+
+    @Cacheable(value = "campeonatos")
 
     public Campeonato buscarCampeonato(Long id){
         return reposit.findById(id)

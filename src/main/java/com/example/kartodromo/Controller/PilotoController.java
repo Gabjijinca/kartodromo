@@ -6,6 +6,7 @@ import com.example.kartodromo.Entity.Piloto;
 import com.example.kartodromo.Exception.DuplicateException;
 import com.example.kartodromo.Exception.EquipeInvalidaException;
 import com.example.kartodromo.Exception.ErroResponse;
+import com.example.kartodromo.Repositorio.PilotoView;
 import com.example.kartodromo.service.PilotoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -66,6 +67,13 @@ public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody @Valid Ca
     public ResponseEntity<?> deletar(@PathVariable Long id){
                pilotoService.deletar(id);
                return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping("/resumo")
+    public ResponseEntity<List<PilotoView>> listarResumo() {
+        List<PilotoView> pilotos = pilotoService.listarResumo();
+        return ResponseEntity.ok(pilotos);
     }
 
 

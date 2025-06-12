@@ -7,7 +7,9 @@ import com.example.kartodromo.Entity.Piloto;
 import com.example.kartodromo.Exception.DuplicateException;
 import com.example.kartodromo.Exception.NotFoundException;
 import com.example.kartodromo.Repositorio.CampeonatoReposit;
+import com.example.kartodromo.Repositorio.PilotoView;
 import com.example.kartodromo.Repositorio.PiltotoReposit;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +33,7 @@ public class PilotoService {
         validarPiloto.validar(piloto);
         return reposit.save(piloto);
     }
-
+    @Cacheable(value = "pilotos")
     public List<Piloto> listarPilotos(){
         return reposit.findAll();
     }
@@ -64,6 +66,7 @@ public class PilotoService {
         return campeonatoReposit.countByFirst(piloto);
     }
 
+    @Cacheable(value = "pilotosComVitorias", key = "#id")
     public PilotoResponseDTO buscarPilotoComVitorias(Long id) {
         Optional<Piloto> pilotoOpt = reposit.findById(id);
         if (pilotoOpt.isEmpty()) {
@@ -74,6 +77,12 @@ public class PilotoService {
         Integer participacoes = campeonatoReposit.countByFirstOrSecondOrThird(piloto,piloto,piloto);
         return new PilotoResponseDTO(piloto.getId(), piloto.getNome(), piloto.getEquipe(), vitorias,participacoes);
     }
+
+    @Cacheable(value = "resumoPilotos")
+    public List<PilotoView> listarResumo() {
+        return reposit.findAllBy();
+    }
+
 
 
 
