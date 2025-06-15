@@ -7,6 +7,7 @@ import com.example.kartodromo.Exception.DuplicateException;
 import com.example.kartodromo.Exception.NotFoundException;
 import com.example.kartodromo.Repositorio.CampeonatoReposit;
 import com.example.kartodromo.Repositorio.PiltotoReposit;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ public class CampeonatoService {
         this.pilotoRepo = pilotoRepo;
         this.campeonatoValidate = campeonato;
     }
+    @CacheEvict(value = "campeonatos", allEntries = true)
 
     public Campeonato salvar(CadastroCampeonatoDTO dto) {
         List<Long> ids = List.of(dto.first(), dto.second(), dto.third());
@@ -61,6 +63,7 @@ public class CampeonatoService {
         return reposit.findAll();
     }
 
+    @CacheEvict(value = "campeonatos", allEntries = true)
 
     public Campeonato atualizar(Long id, CadastroCampeonatoDTO dto) {
         if (!reposit.existsById(id)) {
@@ -84,6 +87,7 @@ public class CampeonatoService {
                 .orElseThrow(() -> new NotFoundException("Piloto com id " + id + " não encontrado."));
     }
 
+    @CacheEvict(value = "campeonatos", allEntries = true)
 
     public void deletarCampeonato(Long id){
             reposit.findById(id).orElseThrow(() -> new NotFoundException("Campeonato com id " + id + " não encontrado."));

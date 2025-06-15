@@ -40,6 +40,12 @@ public class PilotoController {
             return ResponseEntity.ok(dto);
     }
 
+    @GetMapping("/vitorias")
+    public ResponseEntity<List<PilotoResponseDTO>> listarPilotosComVitorias() {
+        List<PilotoResponseDTO> lista = pilotoService.listarPilotosComVitorias();
+        return ResponseEntity.ok(lista);
+    }
+
 
 
     @PostMapping

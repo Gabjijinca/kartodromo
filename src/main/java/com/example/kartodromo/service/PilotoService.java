@@ -9,6 +9,7 @@ import com.example.kartodromo.Exception.NotFoundException;
 import com.example.kartodromo.Repositorio.CampeonatoReposit;
 import com.example.kartodromo.Repositorio.PilotoView;
 import com.example.kartodromo.Repositorio.PiltotoReposit;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class PilotoService {
         this.campeonatoReposit = campeonatoReposit;
     }
 
-
+    @CacheEvict(value = "pilotos", allEntries = true)
     public Piloto salvar(Piloto piloto){
         validarPiloto.validar(piloto);
         return reposit.save(piloto);
@@ -37,7 +38,7 @@ public class PilotoService {
     public List<Piloto> listarPilotos(){
         return reposit.findAll();
     }
-
+    @CacheEvict(value = "pilotos", allEntries = true)
     public Piloto atualizar(Piloto piloto) {
         validarPiloto.validar(piloto);
         if (!reposit.existsById(piloto.getId())) {
@@ -46,7 +47,7 @@ public class PilotoService {
         return reposit.save(piloto);
     }
 
-
+    @CacheEvict(value = "pilotos", allEntries = true)
     public void deletar(Long id) {
         Optional<Piloto> piloto = reposit.findById(id);
         if (piloto.isEmpty()) {
@@ -81,6 +82,23 @@ public class PilotoService {
     @Cacheable(value = "resumoPilotos")
     public List<PilotoView> listarResumo() {
         return reposit.findAllBy();
+    }
+
+    public List<PilotoResponseDTO> listarPilotosComVitorias() {
+        List<Piloto> pilotos = listarPilotos();
+
+        return pilotos.stream()
+                .map(piloto -> {
+                    Integer vitorias = campeonatoReposit.countByFirst(piloto);
+                    Integer participacoes = campeonatoReposit.countByFirstOrSecondOrThird(piloto, piloto, piloto);
+                    return new PilotoResponseDTO(
+                            piloto.getId(),
+                            piloto.getNome(),
+                            piloto.getEquipe(),
+                            vitorias,
+                            participacoes);
+                })
+                .toList();
     }
 
 
